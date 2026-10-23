@@ -44,31 +44,32 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
+        /* Header (patroon B) */
         .header {
             background: var(--white);
             border-bottom: 1px solid var(--slate-200);
-            padding: 1.25rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
             position: relative;
         }
 
         .back-link {
             position: absolute;
-            left: 2rem;
+            top: 1.25rem;
+            left: 1.25rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 44px;
+            padding: 0 0.25rem;
             font-size: 0.875rem;
-            color: var(--slate-400);
+            color: var(--slate-500);
             text-decoration: none;
             transition: color 0.2s;
         }
 
         .back-link:hover {
-            color: var(--accent);
+            color: #047857;
         }
 
         .back-link svg {
@@ -76,16 +77,11 @@
             height: 16px;
         }
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
         .logo {
-            width: 44px;
-            height: 44px;
-            flex-shrink: 0;
+            display: inline-block;
+            width: 56px;
+            height: 56px;
+            margin-bottom: 0.5rem;
         }
 
         .logo svg {
@@ -93,16 +89,37 @@
             height: 100%;
         }
 
-        .header-text h1 {
-            font-size: 1.25rem;
+        .title {
+            font-size: 1.625rem;
             font-weight: 700;
             color: var(--slate-800);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
         }
 
-        .header-text p {
-            font-size: 0.8125rem;
+        .subtitle {
+            font-size: 0.9375rem;
             color: var(--slate-500);
+            margin-top: 0.25rem;
+        }
+
+        :focus-visible {
+            outline: 2px solid #047857;
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 1rem 1.25rem 1.75rem;
+            }
+
+            .back-link {
+                position: static;
+                display: flex;
+                justify-content: center;
+                width: fit-content;
+                margin: 0 auto 0.5rem;
+            }
         }
 
         /* Main */
@@ -124,8 +141,8 @@
         /* Breath circle container */
         .breath-container {
             position: relative;
-            width: 280px;
-            height: 280px;
+            width: min(280px, 100%);
+            aspect-ratio: 1;
             margin: 0 auto 2rem;
             display: flex;
             align-items: center;
@@ -188,12 +205,12 @@
         }
 
         .instruction.active {
-            color: var(--accent);
+            color: #047857;
         }
 
         .sub-instruction {
             font-size: 1rem;
-            color: var(--slate-400);
+            color: var(--slate-500);
             margin-bottom: 2rem;
             min-height: 1.5rem;
         }
@@ -207,6 +224,8 @@
         }
 
         .pattern-btn {
+            min-height: 44px;
+            min-width: 44px;
             padding: 0.5rem 1rem;
             font-size: 0.8125rem;
             font-family: inherit;
@@ -227,7 +246,11 @@
         .pattern-btn.active {
             border-color: var(--accent);
             background: var(--accent-light);
-            color: var(--accent);
+            color: #047857;
+        }
+
+        .pattern-btn:disabled {
+            cursor: default;
         }
 
         /* Button */
@@ -252,12 +275,12 @@
         }
 
         .btn-primary {
-            background: var(--accent);
+            background: #047857;
             color: var(--white);
         }
 
         .btn-primary:hover {
-            background: #0d9668;
+            background: #065f46;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
@@ -275,13 +298,13 @@
         /* Cycle counter */
         .cycle-counter {
             font-size: 0.875rem;
-            color: var(--slate-400);
+            color: var(--slate-500);
             margin-top: 1.5rem;
         }
 
         .cycle-counter span {
             font-weight: 600;
-            color: var(--accent);
+            color: #047857;
         }
 
         /* Hidden */
@@ -297,21 +320,10 @@
 
         .quote {
             font-size: 0.875rem;
-            color: var(--accent);
+            color: #047857;
         }
 
         /* Responsive */
-        @media (max-width: 900px) {
-            .back-link {
-                position: static;
-                margin-bottom: 0.75rem;
-            }
-            
-            .header {
-                flex-direction: column;
-                padding: 1rem 1.5rem;
-            }
-        }
 
         @media (max-width: 640px) {
             .main {
@@ -323,8 +335,7 @@
             }
 
             .breath-container {
-                width: 240px;
-                height: 240px;
+                width: min(240px, 100%);
             }
 
             .breath-circle {
@@ -347,6 +358,10 @@
             .pattern-selector {
                 flex-wrap: wrap;
             }
+
+            .card {
+                padding: 2rem 1rem;
+            }
         }
     
         /* Onder Constructie: gedeelde footer en quote (huisstijl) */
@@ -356,13 +371,13 @@
             margin-top: 2rem;
             border-top: 1px solid #e2e8f0;
             background: #ffffff;
-            color: #10b981;
+            color: #047857;
         }
 
         footer.oc-footer .oc-quote {
             font-size: 0.8125rem;
             line-height: 1.5;
-            color: #10b981;
+            color: #047857;
             opacity: 1;
             font-style: normal;
             margin: 0;
@@ -371,25 +386,21 @@
 </head>
 <body>
     <header class="header">
-        <a href="https://onderconstructie.github.io/reset/" class="back-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <a href="https://onderconstructie.github.io/reset/" class="back-link" aria-label="Terug naar Reset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
             Reset
         </a>
-        <div class="header-content">
-            <div class="logo">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="20" cy="20" r="14" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-                    <circle cx="20" cy="20" r="8" fill="#10b981" opacity="0.5"/>
-                    <circle cx="20" cy="20" r="3" fill="#10b981"/>
-                </svg>
-            </div>
-            <div class="header-text">
-                <h1>Adem</h1>
-                <p>Rust in één minuut</p>
-            </div>
+        <div class="logo">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="20" cy="20" r="18" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+                <circle cx="20" cy="20" r="8" fill="#10b981" opacity="0.5"/>
+                <circle cx="20" cy="20" r="3" fill="#047857"/>
+            </svg>
         </div>
+        <h1 class="title">Adem</h1>
+        <p class="subtitle">Rust in één minuut</p>
     </header>
 
     <main class="main">
@@ -400,14 +411,14 @@
             </div>
 
             <!-- Instructions -->
-            <p class="instruction" id="instruction">Klaar om te beginnen</p>
+            <p class="instruction" id="instruction" aria-live="polite">Klaar om te beginnen</p>
             <p class="sub-instruction" id="subInstruction">Kies een patroon en druk op start</p>
 
             <!-- Pattern selector -->
-            <div class="pattern-selector" id="patternSelector">
-                <button class="pattern-btn active" data-pattern="4-4">4-4</button>
-                <button class="pattern-btn" data-pattern="4-7-8">4-7-8</button>
-                <button class="pattern-btn" data-pattern="box">Box</button>
+            <div class="pattern-selector" id="patternSelector" role="group" aria-label="Ademritme">
+                <button class="pattern-btn active" data-pattern="4-4" aria-pressed="true" aria-label="4-4: 4 tellen in, 4 tellen uit">4-4</button>
+                <button class="pattern-btn" data-pattern="4-7-8" aria-pressed="false" aria-label="4-7-8: 4 in, 7 vasthouden, 8 uit">4-7-8</button>
+                <button class="pattern-btn" data-pattern="box" aria-pressed="false" aria-label="Vierkant: 4 in, 4 vast, 4 uit, 4 vast">Vierkant</button>
             </div>
 
             <!-- Controls -->
@@ -457,7 +468,7 @@
         const patterns = {
             '4-4': { inhale: 4, holdIn: 0, exhale: 4, holdOut: 0, name: 'Basis' },
             '4-7-8': { inhale: 4, holdIn: 7, exhale: 8, holdOut: 0, name: 'Ontspanning' },
-            'box': { inhale: 4, holdIn: 4, exhale: 4, holdOut: 4, name: 'Box Breathing' }
+            'box': { inhale: 4, holdIn: 4, exhale: 4, holdOut: 4, name: 'Vierkant' }
         };
 
         // State
@@ -468,10 +479,12 @@
 
         // Pattern selection
         patternSelector.addEventListener('click', (e) => {
-            if (e.target.classList.contains('pattern-btn') && !isRunning) {
-                document.querySelectorAll('.pattern-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                currentPattern = e.target.dataset.pattern;
+            const btn = e.target.closest('.pattern-btn');
+            if (btn && !isRunning) {
+                document.querySelectorAll('.pattern-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+                btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
+                currentPattern = btn.dataset.pattern;
             }
         });
 
@@ -552,6 +565,8 @@
             cycleCounter.style.visibility = 'visible';
             patternSelector.style.opacity = '0.5';
             patternSelector.style.pointerEvents = 'none';
+            patternSelector.querySelectorAll('button').forEach(b => b.disabled = true);
+            stopBtn.focus();
             
             breathCycle();
         }
@@ -571,6 +586,8 @@
             cycleCounter.style.visibility = 'hidden';
             patternSelector.style.opacity = '1';
             patternSelector.style.pointerEvents = 'auto';
+            patternSelector.querySelectorAll('button').forEach(b => b.disabled = false);
+            startBtn.focus();
         }
 
         // Event listeners
@@ -580,6 +597,7 @@
         // Keyboard
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
+                if (e.target.closest && e.target.closest('button, a')) return;
                 e.preventDefault();
                 if (isRunning) {
                     stop();
