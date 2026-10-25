@@ -10,7 +10,7 @@
     <meta name="oc:labels" content="kalmeren">
     <meta name="oc:kort" content="Een minuut rustig ademen">
     <meta name="oc:volgorde" content="160">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox=&quot;0 0 40 40&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E %3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;18&quot; fill=&quot;%23d1fae5&quot; stroke=&quot;%23047857&quot; stroke-width=&quot;2&quot;/%3E %3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;8&quot; stroke=&quot;%2310b981&quot; stroke-width=&quot;8&quot; fill=&quot;none&quot;/%3E %3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;4&quot; fill=&quot;%23047857&quot;/%3E %3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox=&quot;0 0 40 40&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;18&quot; fill=&quot;%23f8fafc&quot; stroke=&quot;%23e2e8f0&quot; stroke-width=&quot;1.5&quot;/%3E%3Cpath d=&quot;M9 15 H23 A3.5 3.5 0 1 0 19.5 11.5&quot; stroke=&quot;%2310b981&quot; stroke-width=&quot;2.4&quot; stroke-linecap=&quot;round&quot;/%3E%3Cpath d=&quot;M9 20.5 H28 A3.5 3.5 0 1 1 24.5 24&quot; stroke=&quot;%23047857&quot; stroke-width=&quot;2.4&quot; stroke-linecap=&quot;round&quot;/%3E%3Cpath d=&quot;M9 26 H17&quot; stroke=&quot;%2394a3b8&quot; stroke-width=&quot;2.4&quot; stroke-linecap=&quot;round&quot;/%3E%3C/svg%3E">
     <link rel="stylesheet" href="/fonts/fonts.css">
     <style>
         :root {
@@ -238,6 +238,23 @@
             transition: all 0.2s;
         }
 
+        .pattern-btn {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.125rem;
+            line-height: 1.2;
+        }
+        .pattern-btn .pb-count {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--slate-500);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .pattern-btn.active .pb-count { color: #047857; }
+
         .pattern-btn:hover {
             border-color: var(--slate-300);
             color: var(--slate-700);
@@ -382,22 +399,32 @@
             font-style: normal;
             margin: 0;
         }
+        /* Minder beweging: de bol blijft even groot en ademt in licht en kleur */
+        @media (prefers-reduced-motion: reduce) {
+            .breath-circle,
+            .breath-circle.inhale,
+            .breath-circle.hold-in,
+            .breath-circle.exhale,
+            .breath-circle.hold-out {
+                width: 160px;
+                height: 160px;
+                transition: opacity 1s ease, background-color 1s ease, box-shadow 1s ease;
+            }
+            .breath-circle.exhale,
+            .breath-circle.hold-out { opacity: 0.55; }
+        }
     </style>
 </head>
 <body>
     <header class="header">
-        <a href="https://onderconstructie.github.io/reset/" class="back-link" aria-label="Terug naar Reset">
+        <a href="../reset/" class="back-link" aria-label="Terug naar Reset">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
             Reset
         </a>
         <div class="logo">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <circle cx="20" cy="20" r="18" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
-                <circle cx="20" cy="20" r="8" fill="#10b981" opacity="0.5"/>
-                <circle cx="20" cy="20" r="3" fill="#047857"/>
-            </svg>
+            <svg aria-hidden="true" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/><path d="M9 15 H23 A3.5 3.5 0 1 0 19.5 11.5" stroke="#10b981" stroke-width="2.4" stroke-linecap="round"/><path d="M9 20.5 H28 A3.5 3.5 0 1 1 24.5 24" stroke="#047857" stroke-width="2.4" stroke-linecap="round"/><path d="M9 26 H17" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round"/></svg>
         </div>
         <h1 class="title">Adem</h1>
         <p class="subtitle">Een minuut rustig ademen</p>
@@ -412,13 +439,13 @@
 
             <!-- Instructions -->
             <p class="instruction" id="instruction" aria-live="polite">Klaar om te beginnen</p>
-            <p class="sub-instruction" id="subInstruction">Kies een patroon en druk op start</p>
+            <p class="sub-instruction" id="subInstruction">Kies een ritme en druk op start</p>
 
             <!-- Pattern selector -->
             <div class="pattern-selector" id="patternSelector" role="group" aria-label="Ademritme">
-                <button class="pattern-btn active" data-pattern="4-4" aria-pressed="true" aria-label="4-4: 4 tellen in, 4 tellen uit">4-4</button>
-                <button class="pattern-btn" data-pattern="4-7-8" aria-pressed="false" aria-label="4-7-8: 4 in, 7 vasthouden, 8 uit">4-7-8</button>
-                <button class="pattern-btn" data-pattern="box" aria-pressed="false" aria-label="Vierkant: 4 in, 4 vast, 4 uit, 4 vast">Vierkant</button>
+                <button class="pattern-btn active" data-pattern="4-4" aria-pressed="true" aria-label="Rustig: 4 tellen in, 4 tellen uit"><span class="pb-name">Rustig</span><span class="pb-count" aria-hidden="true">4 in · 4 uit</span></button>
+                <button class="pattern-btn" data-pattern="4-7-8" aria-pressed="false" aria-label="Lang uit: 4 tellen in, 7 vasthouden, 8 uit"><span class="pb-name">Lang uit</span><span class="pb-count" aria-hidden="true">4 in · 7 vast · 8 uit</span></button>
+                <button class="pattern-btn" data-pattern="box" aria-pressed="false" aria-label="Vierkant: 4 tellen in, 4 vast, 4 uit, 4 vast"><span class="pb-name">Vierkant</span><span class="pb-count" aria-hidden="true">telkens 4 tellen</span></button>
             </div>
 
             <!-- Controls -->
@@ -577,7 +604,7 @@
             patternSelector.style.opacity = '0.5';
             patternSelector.style.pointerEvents = 'none';
             patternSelector.querySelectorAll('button').forEach(b => b.disabled = true);
-            stopBtn.focus();
+            stopBtn.focus({ preventScroll: true });
             
             breathCycle();
         }
@@ -590,7 +617,7 @@
             breathCircle.className = 'breath-circle';
             instruction.textContent = 'Klaar om te beginnen';
             instruction.classList.remove('active');
-            subInstruction.textContent = 'Kies een patroon en druk op start';
+            subInstruction.textContent = 'Kies een ritme en druk op start';
             
             runningView.classList.add('hidden');
             startView.classList.remove('hidden');
@@ -598,7 +625,7 @@
             patternSelector.style.opacity = '1';
             patternSelector.style.pointerEvents = 'auto';
             patternSelector.querySelectorAll('button').forEach(b => b.disabled = false);
-            startBtn.focus();
+            startBtn.focus({ preventScroll: true });
         }
 
         // Event listeners
