@@ -442,7 +442,7 @@
 
             <!-- Cycle counter -->
             <p class="cycle-counter" id="cycleCounter" style="visibility: hidden;">
-                Cyclus <span id="cycleNumber">1</span>
+                Cyclus <span id="cycleNumber">1</span> · nog <span id="timeLeft">1:00</span>
             </p>
         </div>
     </main>
@@ -476,6 +476,11 @@
         let isRunning = false;
         let cycle = 0;
         let timeoutId = null;
+        // Eén minuut: de lopende ademhaling wordt na 60 seconden rustig afgemaakt, dan stopt het vanzelf
+        const SESSION = 60000;
+        let startAt = 0, tick = null;
+        const timeLeft = document.getElementById('timeLeft');
+        function showLeft() { const s = Math.max(0, Math.ceil((SESSION - (Date.now() - startAt)) / 1000)); timeLeft.textContent = `0:${String(s).padStart(2, '0')}`; }
 
         // Pattern selection
         patternSelector.addEventListener('click', (e) => {
@@ -548,15 +553,21 @@
             cycle++;
             cycleNumber.textContent = cycle;
             
-            // Start next cycle
-            if (isRunning) {
-                breathCycle();
-            }
+            if (!isRunning) return;
+            if (Date.now() - startAt >= SESSION - 1500) { finish(); return; }
+            breathCycle();
+        }
+
+        function finish() {
+            stop();
+            instruction.textContent = 'Klaar';
+            subInstruction.textContent = `Je ademde een minuut rustig: ${cycle} ${cycle === 1 ? "ademhaling" : "ademhalingen"}. Nog een minuut? Druk op start.`;
         }
 
         // Start
         function start() {
             isRunning = true;
+            startAt = Date.now(); showLeft(); clearInterval(tick); tick = setInterval(showLeft, 500);
             cycle = 0;
             cycleNumber.textContent = '1';
             
@@ -574,7 +585,7 @@
         // Stop
         function stop() {
             isRunning = false;
-            clearTimeout(timeoutId);
+            clearTimeout(timeoutId); clearInterval(tick);
             
             breathCircle.className = 'breath-circle';
             instruction.textContent = 'Klaar om te beginnen';
