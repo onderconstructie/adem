@@ -399,6 +399,16 @@
             font-style: normal;
             margin: 0;
         }
+        /* Desktop: bol, knop en teller samen boven de vouw */
+        @media (min-width: 641px) {
+            .main { padding-top: 1.5rem; }
+            .card { padding-top: 2rem; }
+            .breath-container { width: min(240px, 100%); margin-bottom: 1.5rem; }
+        }
+        @media (max-width: 640px) {
+            .pattern-btn { padding: 0.5rem 0.625rem; }
+        }
+
         /* Minder beweging: de bol blijft even groot en ademt in licht en kleur */
         @media (prefers-reduced-motion: reduce) {
             .breath-circle,
