@@ -46,6 +46,7 @@
             color: var(--slate-700);
             line-height: 1.5;
             min-height: 100vh;
+            min-height: 100dvh;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -154,51 +155,40 @@
             justify-content: center;
         }
 
+        /* De bol ademt met transform en opacity: vloeiend, ook op een trage gsm (geen layout of grote schaduw per frame) */
         .breath-circle {
-            width: 120px;
-            height: 120px;
+            --klein: 0.55;
+            position: relative;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
             background: var(--accent-light);
-            transition: all 4s ease-in-out;
+            transform: scale(var(--klein));
+            transition: transform 4s ease-in-out;
             box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.15),
                         0 0 40px 10px rgba(16, 185, 129, 0.05);
         }
-
-        .breath-circle.inhale {
-            width: 220px;
-            height: 220px;
-            background: var(--accent);
+        .breath-circle::before,
+        .breath-circle::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 4s ease-in-out;
+            transition-duration: inherit;
+            pointer-events: none;
+        }
+        .breath-circle::before { background: var(--accent); }
+        .breath-circle::after {
             box-shadow: 0 0 40px 15px rgba(16, 185, 129, 0.4),
                         0 0 80px 30px rgba(16, 185, 129, 0.25),
                         0 0 120px 50px rgba(16, 185, 129, 0.1);
         }
-
-        .breath-circle.hold-in {
-            width: 220px;
-            height: 220px;
-            background: var(--accent);
-            box-shadow: 0 0 40px 15px rgba(16, 185, 129, 0.4),
-                        0 0 80px 30px rgba(16, 185, 129, 0.25),
-                        0 0 120px 50px rgba(16, 185, 129, 0.1);
-            transition: all 0.1s;
-        }
-
-        .breath-circle.exhale {
-            width: 120px;
-            height: 120px;
-            background: var(--accent-light);
-            box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.15),
-                        0 0 40px 10px rgba(16, 185, 129, 0.05);
-        }
-
-        .breath-circle.hold-out {
-            width: 120px;
-            height: 120px;
-            background: var(--accent-light);
-            box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.15),
-                        0 0 40px 10px rgba(16, 185, 129, 0.05);
-            transition: all 0.1s;
-        }
+        .breath-circle.inhale,
+        .breath-circle.hold-in { transform: scale(1); }
+        .breath-circle.inhale::before, .breath-circle.inhale::after,
+        .breath-circle.hold-in::before, .breath-circle.hold-in::after { opacity: 1; }
 
         /* Instruction */
         .instruction {
@@ -361,20 +351,8 @@
             }
 
             .breath-circle {
-                width: 100px;
-                height: 100px;
-            }
-
-            .breath-circle.inhale,
-            .breath-circle.hold-in {
                 width: 180px;
                 height: 180px;
-            }
-
-            .breath-circle.exhale,
-            .breath-circle.hold-out {
-                width: 100px;
-                height: 100px;
             }
 
             .pattern-selector {
@@ -421,10 +399,10 @@
             .breath-circle.hold-in,
             .breath-circle.exhale,
             .breath-circle.hold-out {
-                width: 160px;
-                height: 160px;
-                transition: opacity 1s ease, background-color 1s ease, box-shadow 1s ease;
+                transform: scale(0.73);
+                transition: opacity 1s ease !important;
             }
+            .breath-circle::before, .breath-circle::after { transition-duration: 1s !important; }
             .breath-circle.exhale,
             .breath-circle.hold-out { opacity: 0.55; }
         }
@@ -452,7 +430,6 @@
             .oc-medisch { color: var(--slate-500) !important; }
             .btn-primary:hover { background: #047857; box-shadow: 0 0 0 2px #10b981; }
             .breath-circle { background: rgba(16, 185, 129, 0.22); }
-            .breath-circle.exhale, .breath-circle.hold-out { background: rgba(16, 185, 129, 0.22); }
         }
 
         /* Hoog contrast: de gekozen knop krijgt een dikke rand en een vinkje */
@@ -461,8 +438,16 @@
             .pattern-btn[aria-pressed="true"] { border: 3px solid Highlight; }
             .pattern-btn[aria-pressed="true"] .pb-name::before { content: "\2713  "; }
             .breath-circle { border: 3px solid CanvasText; }
-            .breath-circle.inhale, .breath-circle.hold-in { forced-color-adjust: none; background: Highlight; }
+            .breath-circle::before { forced-color-adjust: none; background: Highlight; }
             :focus-visible { outline: 3px solid Highlight; }
+        }
+
+        /* Soepel op gsm: geen tikvertraging, eigen tikfeedback, grote knop in de duimzone */
+        a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        .btn:active, .pattern-btn:active:not(:disabled) { filter: brightness(0.92); }
+        .btn-primary:active { transform: scale(0.98); }
+        @media (pointer: coarse) {
+            #startView .btn, #runningView .btn { min-height: 56px; min-width: min(100%, 15rem); font-size: 1.0625rem; }
         }
     </style>
 </head>
@@ -584,12 +569,18 @@
             }
         });
 
+        // De bol beweegt precies even lang als de fase duurt (ook bij 8 tellen uitademen)
+        function phase(cls, sec) {
+            breathCircle.style.transitionDuration = sec + 's';
+            breathCircle.className = 'breath-circle ' + cls;
+        }
+
         // Breath cycle
         function breathCycle() {
             const pattern = patterns[currentPattern];
             
             // Inhale
-            breathCircle.className = 'breath-circle inhale';
+            phase('inhale', pattern.inhale);
             instruction.textContent = 'Adem in';
             instruction.classList.add('active');
             subInstruction.textContent = `${pattern.inhale} seconden`;
@@ -599,7 +590,7 @@
                 
                 // Hold in (if applicable)
                 if (pattern.holdIn > 0) {
-                    breathCircle.className = 'breath-circle hold-in';
+                    phase('hold-in', pattern.holdIn);
                     instruction.textContent = 'Vasthouden';
                     subInstruction.textContent = `${pattern.holdIn} seconden`;
                     
@@ -617,7 +608,7 @@
             const pattern = patterns[currentPattern];
             
             // Exhale
-            breathCircle.className = 'breath-circle exhale';
+            phase('exhale', pattern.exhale);
             instruction.textContent = 'Adem uit';
             subInstruction.textContent = `${pattern.exhale} seconden`;
             
@@ -626,7 +617,7 @@
                 
                 // Hold out (if applicable)
                 if (pattern.holdOut > 0) {
-                    breathCircle.className = 'breath-circle hold-out';
+                    phase('hold-out', pattern.holdOut);
                     instruction.textContent = 'Vasthouden';
                     subInstruction.textContent = `${pattern.holdOut} seconden`;
                     
@@ -681,6 +672,7 @@
             clearTimeout(timeoutId); clearInterval(tick);
             releaseWake(); if (wasRunning) ocBusy(false);
             
+            breathCircle.style.transitionDuration = '0.6s';
             breathCircle.className = 'breath-circle';
             instruction.textContent = 'Klaar om te beginnen';
             instruction.classList.remove('active');
