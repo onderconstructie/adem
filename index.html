@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)">
     <title>Adem – Onder Constructie</title>
     <meta name="description" content="Breng je zenuwstelsel tot rust met begeleide ademhalingsoefeningen. Eenvoudig, visueel en direct kalmerend.">
     <meta name="oc:groep" content="reset">
@@ -27,6 +29,9 @@
             --accent: #10b981;
             --accent-light: #d1fae5;
             --accent-dark: #065f46;
+            --ink: #047857;
+            --ring: #047857;
+            color-scheme: light;
         }
 
         * {
@@ -69,7 +74,7 @@
         }
 
         .back-link:hover {
-            color: #047857;
+            color: var(--ink);
         }
 
         .back-link svg {
@@ -104,7 +109,7 @@
         }
 
         :focus-visible {
-            outline: 2px solid #047857;
+            outline: 2px solid var(--ring);
             outline-offset: 2px;
         }
 
@@ -205,7 +210,7 @@
         }
 
         .instruction.active {
-            color: #047857;
+            color: var(--ink);
         }
 
         .sub-instruction {
@@ -253,7 +258,7 @@
             font-variant-numeric: tabular-nums;
             white-space: nowrap;
         }
-        .pattern-btn.active .pb-count { color: #047857; }
+        .pattern-btn.active .pb-count { color: var(--ink); }
 
         .pattern-btn:hover {
             border-color: var(--slate-300);
@@ -263,7 +268,7 @@
         .pattern-btn.active {
             border-color: var(--accent);
             background: var(--accent-light);
-            color: #047857;
+            color: var(--ink);
         }
 
         .pattern-btn:disabled {
@@ -293,7 +298,7 @@
 
         .btn-primary {
             background: #047857;
-            color: var(--white);
+            color: #ffffff;
         }
 
         .btn-primary:hover {
@@ -321,7 +326,7 @@
 
         .cycle-counter span {
             font-weight: 600;
-            color: #047857;
+            color: var(--ink);
         }
 
         /* Hidden */
@@ -337,7 +342,7 @@
 
         .quote {
             font-size: 0.875rem;
-            color: #047857;
+            color: var(--ink);
         }
 
         /* Responsive */
@@ -386,15 +391,15 @@
             text-align: center;
             padding: 2rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
             margin-top: 2rem;
-            border-top: 1px solid #e2e8f0;
-            background: #ffffff;
-            color: #047857;
+            border-top: 1px solid var(--slate-200);
+            background: var(--white);
+            color: var(--ink);
         }
 
         footer.oc-footer .oc-quote {
             font-size: 0.8125rem;
             line-height: 1.5;
-            color: #047857;
+            color: var(--ink);
             opacity: 1;
             font-style: normal;
             margin: 0;
@@ -422,6 +427,42 @@
             }
             .breath-circle.exhale,
             .breath-circle.hold-out { opacity: 0.55; }
+        }
+    
+        /* Donkere modus: rustig donker slate, groen accent */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+                --slate-50: #0f172a;
+                --slate-100: #273449;
+                --slate-200: #334155;
+                --slate-300: #475569;
+                --slate-400: #94a3b8;
+                --slate-500: #94a3b8;
+                --slate-600: #cbd5e1;
+                --slate-700: #e2e8f0;
+                --slate-800: #f1f5f9;
+                --white: #1e293b;
+                --accent-light: rgba(16, 185, 129, 0.18);
+                --accent-dark: #a7f3d0;
+                --ink: #a7f3d0;
+                --ring: #a7f3d0;
+            }
+            .logo svg circle:first-child { fill: #273449; stroke: #334155; }
+            .oc-medisch { color: var(--slate-500) !important; }
+            .btn-primary:hover { background: #047857; box-shadow: 0 0 0 2px #10b981; }
+            .breath-circle { background: rgba(16, 185, 129, 0.22); }
+            .breath-circle.exhale, .breath-circle.hold-out { background: rgba(16, 185, 129, 0.22); }
+        }
+
+        /* Hoog contrast: de gekozen knop krijgt een dikke rand en een vinkje */
+        @media (forced-colors: active) {
+            .pattern-btn, .btn { border: 1px solid ButtonText; }
+            .pattern-btn[aria-pressed="true"] { border: 3px solid Highlight; }
+            .pattern-btn[aria-pressed="true"] .pb-name::before { content: "\2713  "; }
+            .breath-circle { border: 3px solid CanvasText; }
+            .breath-circle.inhale, .breath-circle.hold-in { forced-color-adjust: none; background: Highlight; }
+            :focus-visible { outline: 3px solid Highlight; }
         }
     </style>
 </head>
@@ -501,6 +542,18 @@
         const stopBtn = document.getElementById('stopBtn');
         const cycleCounter = document.getElementById('cycleCounter');
         const cycleNumber = document.getElementById('cycleNumber');
+
+        // Scherm wakker houden tijdens de oefening (waar de browser het toelaat)
+        let wakeLock = null, wantWake = false;
+        async function lockWake() {
+            if (!wantWake || wakeLock || document.visibilityState !== 'visible') return;
+            try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) {}
+        }
+        function releaseWake() { wantWake = false; try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') lockWake(); });
+        addEventListener('pagehide', () => { if (isRunning) ocBusy(false); });
+        // De app laten weten dat er een oefening loopt
+        function ocBusy(busy) { try { if (window.parent !== window) window.parent.postMessage({ type: 'oc-busy', busy: !!busy, title: busy ? 'Adem' : '' }, '*'); } catch (e) {} }
 
         // Patterns (in seconds)
         const patterns = {
@@ -616,14 +669,17 @@
             patternSelector.style.pointerEvents = 'none';
             patternSelector.querySelectorAll('button').forEach(b => b.disabled = true);
             stopBtn.focus({ preventScroll: true });
+            wantWake = true; lockWake(); ocBusy(true);
             
             breathCycle();
         }
 
         // Stop
         function stop() {
+            const wasRunning = isRunning;
             isRunning = false;
             clearTimeout(timeoutId); clearInterval(tick);
+            releaseWake(); if (wasRunning) ocBusy(false);
             
             breathCircle.className = 'breath-circle';
             instruction.textContent = 'Klaar om te beginnen';
