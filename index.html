@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#ffffff">
     <title>Adem – Onder Constructie</title>
     <meta name="description" content="Breng je zenuwstelsel tot rust met begeleide ademhalingsoefeningen. Eenvoudig, visueel en direct kalmerend.">
     <meta name="oc:groep" content="reset">
@@ -408,29 +407,7 @@
         }
     
         /* Donkere modus: rustig donker slate, groen accent */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                color-scheme: dark;
-                --slate-50: #0f172a;
-                --slate-100: #273449;
-                --slate-200: #334155;
-                --slate-300: #475569;
-                --slate-400: #94a3b8;
-                --slate-500: #94a3b8;
-                --slate-600: #cbd5e1;
-                --slate-700: #e2e8f0;
-                --slate-800: #f1f5f9;
-                --white: #1e293b;
-                --accent-light: rgba(16, 185, 129, 0.18);
-                --accent-dark: #a7f3d0;
-                --ink: #a7f3d0;
-                --ring: #a7f3d0;
-            }
-            .logo svg circle:first-child { fill: #273449; stroke: #334155; }
-            .oc-medisch { color: var(--slate-500) !important; }
-            .btn-primary:hover { background: #047857; box-shadow: 0 0 0 2px #10b981; }
-            .breath-circle { background: rgba(16, 185, 129, 0.22); }
-        }
+        
 
         /* Hoog contrast: de gekozen knop krijgt een dikke rand en een vinkje */
         @media (forced-colors: active) {
