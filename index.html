@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#ffffff">
     <title>Adem – Onder Constructie</title>
-    <meta name="description" content="Breng je zenuwstelsel tot rust met begeleide ademhalingsoefeningen. Eenvoudig, visueel en direct kalmerend.">
+    <meta name="description" content="Een minuut rustig ademen op het ritme van een bol die groeit en krimpt. Kies zelf je tempo.">
     <meta name="oc:groep" content="reset">
     <meta name="oc:labels" content="kalmeren">
     <meta name="oc:kort" content="Een minuut rustig ademen">
@@ -308,9 +308,18 @@
 
         /* Cycle counter */
         .cycle-counter {
+            font-variant-numeric: tabular-nums;
             font-size: 0.875rem;
             color: var(--slate-500);
             margin-top: 1.5rem;
+        }
+
+        .adem-tip {
+            font-size: 0.8125rem;
+            color: var(--slate-500);
+            max-width: 22rem;
+            margin: 0 auto 1.5rem;
+            line-height: 1.45;
         }
 
         .cycle-counter span {
@@ -457,9 +466,10 @@
             <!-- Pattern selector -->
             <div class="pattern-selector" id="patternSelector" role="group" aria-label="Ademritme">
                 <button class="pattern-btn active" data-pattern="4-4" aria-pressed="true" aria-label="Rustig: 4 tellen in, 4 tellen uit"><span class="pb-name">Rustig</span><span class="pb-count" aria-hidden="true">4 in · 4 uit</span></button>
-                <button class="pattern-btn" data-pattern="4-7-8" aria-pressed="false" aria-label="Lang uit: 4 tellen in, 7 vasthouden, 8 uit"><span class="pb-name">Lang uit</span><span class="pb-count" aria-hidden="true">4 in · 7 vast · 8 uit</span></button>
-                <button class="pattern-btn" data-pattern="box" aria-pressed="false" aria-label="Vierkant: 4 tellen in, 4 vast, 4 uit, 4 vast"><span class="pb-name">Vierkant</span><span class="pb-count" aria-hidden="true">telkens 4 tellen</span></button>
+                <button class="pattern-btn" data-pattern="4-6" aria-pressed="false" aria-label="Lang uit: 4 tellen in, 6 tellen uit"><span class="pb-name">Lang uit</span><span class="pb-count" aria-hidden="true">4 in · 6 uit</span></button>
+                <button class="pattern-btn" data-pattern="pauze" aria-pressed="false" aria-label="Met pauzes: 4 tellen in, 2 even vast, 4 uit, 2 pauze"><span class="pb-name">Met pauzes</span><span class="pb-count" aria-hidden="true">4 in · 4 uit + pauzes</span></button>
             </div>
+            <p class="adem-tip" id="ademTip">Voelt het onprettig of word je licht in je hoofd? Adem dan gewoon in je eigen tempo.</p>
 
             <!-- Controls -->
             <div id="startView">
@@ -482,7 +492,7 @@
 
             <!-- Cycle counter -->
             <p class="cycle-counter" id="cycleCounter" style="visibility: hidden;">
-                Cyclus <span id="cycleNumber">1</span> · nog <span id="timeLeft">1:00</span>
+                Ademhaling <span id="cycleNumber">1</span> · <span id="timeLeft">nog 1:00</span>
             </p>
         </div>
     </main>
@@ -518,11 +528,13 @@
         function ocBusy(busy) { try { if (window.parent !== window) window.parent.postMessage({ type: 'oc-busy', busy: !!busy, title: busy ? 'Adem' : '' }, '*'); } catch (e) {} }
 
         // Patterns (in seconds)
+        // Eigen, zachte ritmes: korte of geen pauzes, de uitademing nooit korter dan de inademing
         const patterns = {
-            '4-4': { inhale: 4, holdIn: 0, exhale: 4, holdOut: 0, name: 'Basis' },
-            '4-7-8': { inhale: 4, holdIn: 7, exhale: 8, holdOut: 0, name: 'Ontspanning' },
-            'box': { inhale: 4, holdIn: 4, exhale: 4, holdOut: 4, name: 'Vierkant' }
+            '4-4': { inhale: 4, holdIn: 0, exhale: 4, holdOut: 0 },
+            '4-6': { inhale: 4, holdIn: 0, exhale: 6, holdOut: 0 },
+            'pauze': { inhale: 4, holdIn: 2, exhale: 4, holdOut: 2 }
         };
+        const cycleLen = p => (p.inhale + p.holdIn + p.exhale + p.holdOut) * 1000;
 
         // State
         let currentPattern = '4-4';
@@ -533,7 +545,7 @@
         const SESSION = 60000;
         let startAt = 0, tick = null;
         const timeLeft = document.getElementById('timeLeft');
-        function showLeft() { const s = Math.max(0, Math.ceil((SESSION - (Date.now() - startAt)) / 1000)); timeLeft.textContent = `0:${String(s).padStart(2, '0')}`; }
+        function showLeft() { const s = Math.max(0, Math.ceil((SESSION - (Date.now() - startAt)) / 1000)); timeLeft.textContent = s > 0 ? `nog 0:${String(s).padStart(2, '0')}` : 'laatste ademhaling'; }
 
         // Pattern selection
         patternSelector.addEventListener('click', (e) => {
@@ -568,7 +580,7 @@
                 // Hold in (if applicable)
                 if (pattern.holdIn > 0) {
                     phase('hold-in', pattern.holdIn);
-                    instruction.textContent = 'Vasthouden';
+                    instruction.textContent = 'Hou even vast';
                     subInstruction.textContent = `${pattern.holdIn} seconden`;
                     
                     timeoutId = setTimeout(() => {
@@ -595,7 +607,7 @@
                 // Hold out (if applicable)
                 if (pattern.holdOut > 0) {
                     phase('hold-out', pattern.holdOut);
-                    instruction.textContent = 'Vasthouden';
+                    instruction.textContent = 'Even pauze';
                     subInstruction.textContent = `${pattern.holdOut} seconden`;
                     
                     timeoutId = setTimeout(() => {
@@ -610,17 +622,17 @@
 
         function completeCycle() {
             cycle++;
-            cycleNumber.textContent = cycle;
-            
             if (!isRunning) return;
-            if (Date.now() - startAt >= SESSION - 1500) { finish(); return; }
+            // Nog een ademhaling als die grotendeels binnen de minuut valt; anders hier rustig stoppen
+            if (Date.now() - startAt + cycleLen(patterns[currentPattern]) / 2 > SESSION + 500) { finish(); return; }
+            cycleNumber.textContent = cycle + 1;
             breathCycle();
         }
 
         function finish() {
             stop();
             instruction.textContent = 'Klaar';
-            subInstruction.textContent = `Je ademde een minuut rustig: ${cycle} ${cycle === 1 ? "ademhaling" : "ademhalingen"}. Nog een minuut? Druk op start.`;
+            subInstruction.textContent = `Een minuut, ${cycle} ${cycle === 1 ? "ademhaling" : "ademhalingen"}. Nog een minuut? Druk op start.`;
         }
 
         // Start
