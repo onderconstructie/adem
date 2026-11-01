@@ -241,7 +241,7 @@
             line-height: 1.2;
         }
         .pattern-btn .pb-count {
-            font-size: 0.6875rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: var(--slate-500);
             font-variant-numeric: tabular-nums;
@@ -435,7 +435,11 @@
         @media (pointer: coarse) {
             #startView .btn, #runningView .btn { min-height: 56px; min-width: min(100%, 15rem); font-size: 1.0625rem; }
         }
-    </style>
+    
+/* Voet altijd onderaan, ook op een hoog scherm (tablet): zoals in de andere tools */
+body { display:flex; flex-direction:column; }
+body > main { flex:1 0 auto; width:100%; }
+</style>
 </head>
 <body>
     <header class="header">
