@@ -487,7 +487,7 @@ header.header h1 + p, header.header h1 + p.subtitle, .oc-head h1 + p, .oc-head h
                 <button class="pattern-btn" data-pattern="4-6" aria-pressed="false" aria-label="Lang uit: 4 tellen in, 6 tellen uit"><span class="pb-name">Lang uit</span><span class="pb-count" aria-hidden="true">4 in · 6 uit</span></button>
                 <button class="pattern-btn" data-pattern="pauze" aria-pressed="false" aria-label="Met pauzes: 4 tellen in, 2 even vast, 4 uit, 2 pauze"><span class="pb-name">Met pauzes</span><span class="pb-count" aria-hidden="true">4 in · 4 uit + pauzes</span></button>
             </div>
-            <p class="adem-tip" id="ademTip">Voelt het onprettig of word je licht in je hoofd? Adem dan gewoon in je eigen tempo.</p>
+            <p class="adem-tip" id="ademTip">Voelt het onaangenaam of word je licht in je hoofd? Adem dan gewoon in je eigen tempo.</p>
 
             <!-- Controls -->
             <div id="startView">
@@ -517,7 +517,7 @@ header.header h1 + p, header.header h1 + p.subtitle, .oc-head h1 + p, .oc-head h
 
     <footer class="footer oc-footer">
         <p class="quote oc-quote">Even trager ademen, en de dag wordt even trager.</p>
-        <p class="oc-medisch" style="font-size:0.75rem;color:#64748b;margin:0.5rem auto 0;max-width:30rem;line-height:1.5;text-align:center">Dit is geen medische behandeling of diagnose. Heb je klachten, zoek dan hulp via je huisarts of een psycholoog.</p>
+        <p class="oc-medisch" style="font-size:0.75rem;color:#64748b;margin:0.5rem auto 0;max-width:30rem;line-height:1.5;text-align:center">Dit is geen medische behandeling of diagnose. Heb je klachten, zoek dan hulp via je huisarts of een psycholoog. Is het dringend? Bel 112.</p>
     </footer>
 
     <script>
@@ -563,7 +563,7 @@ header.header h1 + p, header.header h1 + p.subtitle, .oc-head h1 + p, .oc-head h
         const SESSION = 60000;
         let startAt = 0, tick = null;
         const timeLeft = document.getElementById('timeLeft');
-        function showLeft() { const s = Math.max(0, Math.ceil((SESSION - (Date.now() - startAt)) / 1000)); timeLeft.textContent = s > 0 ? `nog 0:${String(s).padStart(2, '0')}` : 'laatste ademhaling'; }
+        function showLeft() { const s = Math.max(0, Math.ceil((SESSION - (Date.now() - startAt)) / 1000)); timeLeft.textContent = s > 0 ? `nog ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : 'laatste ademhaling'; }
 
         // Pattern selection
         patternSelector.addEventListener('click', (e) => {
